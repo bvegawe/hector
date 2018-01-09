@@ -141,13 +141,10 @@ void Logger::open( const string& logName, const bool echoToScreen,
                   LogLevel minLogLevel, const bool echoToFile ) throw ( h_exception )
 {
     H_ASSERT( !isInitialized, "This log has already been initialized." );
-
-    chk_logdir(LOG_DIRECTORY);
-    
-    const string fqName = LOG_DIRECTORY + logName + LOG_EXTENSION;	// fully-qualified name
 	
     this->minLogLevel = minLogLevel;
     this->echoToFile = echoToFile;
+    
     if (echoToFile) {
         chk_logdir(LOG_DIRECTORY);
         const string fqName = LOG_DIRECTORY + logName + LOG_EXTENSION;	// fully-qualified name
