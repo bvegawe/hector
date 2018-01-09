@@ -32,7 +32,8 @@ CSVOutputVisitor::CSVOutputVisitor( const string& filename )
 
     // Print table header
     csvFile << "run_name" << DELIMITER << "Year" << DELIMITER << D_ATMOSPHERIC_CO2
-        << DELIMITER << D_RF_TOTAL << std::endl;
+            << DELIMITER << D_RF_TOTAL << DELIMITER << D_GLOBAL_TEMP << DELIMITER
+            << D_HEAT_FLUX << std::endl;
 }
 
 //------------------------------------------------------------------------------
@@ -59,6 +60,8 @@ void CSVOutputVisitor::visit( Core* c ) {
     csvFile << DELIMITER << currDate;
     csvFile << DELIMITER << c->sendMessage( M_GETDATA, D_ATMOSPHERIC_CO2 ).value( U_PPMV_CO2 );
     csvFile << DELIMITER << c->sendMessage( M_GETDATA, D_RF_TOTAL ).value( U_W_M2 );
+    csvFile << DELIMITER << c->sendMessage( M_GETDATA, D_GLOBAL_TEMP ).value( U_DEGC );
+    csvFile << DELIMITER << c->sendMessage( M_GETDATA, D_HEAT_FLUX ).value( U_W_M2 );
     csvFile << std::endl;
 }
 
