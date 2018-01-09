@@ -130,25 +130,35 @@ Logger::~Logger() {
  * \param echoToScreen A flag to indicate if messages should be echoed to the
  *                     console.
  * \param minLogLevel The minimum priority which will be processed.
+ * \param echoToFile A flag to indicate if messages should be written to a log
+ *                   file. If neither echoToScreen nor echoToFile is true, the
+ *                   logger is disabled.
+ *                   (default: true)
  * \exception h_exception Exception thrown if the logger has already been
  *                        initialized.
  */
 void Logger::open( const string& logName, const bool echoToScreen,
-                  LogLevel minLogLevel ) throw ( h_exception )
+                  LogLevel minLogLevel, const bool echoToFile ) throw ( h_exception )
 {
     H_ASSERT( !isInitialized, "This log has already been initialized." );
-
-    chk_logdir(LOG_DIRECTORY);
-    
-    const string fqName = LOG_DIRECTORY + logName + LOG_EXTENSION;	// fully-qualified name
 	
     this->minLogLevel = minLogLevel;
+    this->echoToFile = echoToFile;
     
-    LoggerStreamBuf* buff = new LoggerStreamBuf( echoToScreen );
-    if( !buff->open( fqName.c_str(), ios::out ) )
-        H_THROW("Unable to open log file " + fqName);
+    if (echoToFile) {
+        chk_logdir(LOG_DIRECTORY);
+        const string fqName = LOG_DIRECTORY + logName + LOG_EXTENSION;	// fully-qualified name
+
+        LoggerStreamBuf* buff = new LoggerStreamBuf( echoToScreen );
+        if( !buff->open( fqName.c_str(), ios::out ) )
+            H_THROW("Unable to open log file " + fqName);
+
+        loggerStream.rdbuf( buff );
+    } else {
+        loggerStream.rdbuf( cout.rdbuf() );
+    }
+    enabled = echoToScreen || echoToFile;
     
-    loggerStream.rdbuf( buff );
     isInitialized = true;
 
     // ensure that the log header is always printed.
@@ -161,7 +171,7 @@ void Logger::open( const string& logName, const bool echoToScreen,
  *  \return True if this level would be logged, false otherwise.
  */
 bool Logger::shouldWrite( const LogLevel writeLevel ) const {
-    return writeLevel >= minLogLevel;
+    return enabled && writeLevel >= minLogLevel;
 }
 
 //------------------------------------------------------------------------------
@@ -190,13 +200,15 @@ ostream& Logger::write( const LogLevel writeLevel,
  */
 void Logger::close() {
     if( isInitialized ) {
-        LoggerStreamBuf *lsbuf = static_cast<LoggerStreamBuf*>( loggerStream.rdbuf() );
-        lsbuf->close();
+        if (echoToFile) {
+            LoggerStreamBuf *lsbuf = static_cast<LoggerStreamBuf*>( loggerStream.rdbuf() );
+            lsbuf->close();
+            delete lsbuf;
+        }
         /*! \note Setting isInitialized back to false will allow this logger to
          *        be reopened.
          */
         isInitialized = false;
-        delete lsbuf;
     }
 }
 

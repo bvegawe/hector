@@ -65,12 +65,20 @@ int main (int argc, char * const argv[]) {
         
         // Create visitors
         H_LOG( glog, Logger::NOTICE ) << "Adding visitors to the core." << endl;
-        CSVOutputVisitor csvOutputVisitor( string( OUTPUT_DIRECTORY ) + "output.csv"  );
+        
+        // Open the output file, which has an optional run name (specified in the INI file) in it
+        string rn = core.getRun_name();
+        string output_file;
+        if(rn == "" ) {
+            output_file = string( OUTPUT_DIRECTORY ) + "output.csv";
+        } else {
+            output_file = string( OUTPUT_DIRECTORY ) + "output_" + rn + ".csv";
+        }
+        CSVOutputVisitor csvOutputVisitor( output_file );
         core.addVisitor( &csvOutputVisitor );
         filebuf csvoutputStreamFile;
         
-        // Open the stream output file, which has an optional run name (specified in the INI file) in it
-        string rn = core.getRun_name();
+        // Open the stream output file, with the same optional run name
         if( rn == "" )
             csvoutputStreamFile.open( string( string( OUTPUT_DIRECTORY ) + "outputstream.csv" ).c_str(), ios::out );
         else
