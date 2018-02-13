@@ -22,6 +22,7 @@
 #include "components/so2_component.hpp"
 #include "components/forcing_component.hpp"
 #include "components/slr_component.hpp"
+#include "components/slr_brick_component.hpp"
 #include "components/ocean_component.hpp"
 #include "components/onelineocean_component.hpp"
 #include "components/o3_component.hpp"
@@ -108,11 +109,13 @@ void Core::init() {
     modelComponents[ temp->getComponentName() ] = temp;
 	temp = new slrComponent();
     modelComponents[ temp->getComponentName() ] = temp;
+        temp = new slrBRICKComponent();
+    modelComponents[ temp->getComponentName() ] = temp; 
 	temp = new OceanComponent();
     modelComponents[ temp->getComponentName() ] = temp;
 	temp = new OneLineOceanComponent();
     modelComponents[ temp->getComponentName() ] = temp;
-    temp = new TemperatureComponent();
+        temp = new TemperatureComponent();
     modelComponents[ temp->getComponentName() ] = temp;
     
     temp = new HalocarbonComponent( CF4_COMPONENT_BASE );

@@ -39,6 +39,7 @@ public:
     virtual void visit( BlackCarbonComponent* c );
     virtual void visit( OrganicCarbonComponent* c );
     virtual void visit( slrComponent* c );
+    virtual void visit( slrBRICKComponent* c );
     virtual void visit( OceanComponent* c );
     virtual void visit( OzoneComponent* c );
     virtual void visit( OHComponent* c );

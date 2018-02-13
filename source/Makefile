@@ -1,11 +1,11 @@
 ifeq ($(strip $(CXX)),)
 CXX      = g++
 endif
-CXXFLAGS = -g $(INCLUDES) $(OPTFLAGS) $(CXXEXTRA) $(CXXPROF) $(WFLAGS) -MMD
+CXXFLAGS = -g $(INCLUDES) $(OPTFLAGS) $(CXXEXTRA) $(CXXPROF) $(WFLAGS) -MMD -L$(HROOT)/source/components/BRICK_fortran/ -lbrick -Wl,-rpath $(HROOT)/source/components/BRICK_fortran/  #Edited to include BRICK SLR library
 INCLUDES = -I$(BOOSTROOT) -I$(HDRDIR)
 WFLAGS   = -Wall -Wno-unused-local-typedefs # Turn on warnings, turn off one particularly annoying one that infests Boost libs
 OPTFLAGS = -O3
-LDFLAGS	 = $(CXXPROF) -L$(BOOSTLIB) -L. -Wl,-rpath $(BOOSTLIB)
+LDFLAGS	 = $(CXXPROF) -L$(BOOSTLIB) -L. -L$(HROOT)/source/components/BRICK_fortran/ -Wl,-rpath $(BOOSTLIB)  -lbrick -Wl,-rpath $(HROOT)/source/components/BRICK_fortran/  #Edited to include BRICK SLR library
 
 export CXXFLAGS OPTFLAGS
 

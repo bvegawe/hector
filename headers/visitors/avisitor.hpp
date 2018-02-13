@@ -21,6 +21,7 @@ class Core;
 class DummyModelComponent;
 class ForcingComponent;
 class slrComponent;
+class slrBRICKComponent;
 class HalocarbonComponent;
 class SimpleNbox;
 class CarbonCycleSolver;
@@ -58,6 +59,7 @@ public:
     virtual void visit( DummyModelComponent* c ) {}
     virtual void visit( ForcingComponent* c ) {}
     virtual void visit( slrComponent* c ) {}
+    virtual void visit( slrBRICKComponent* c ) {}
     virtual void visit( CarbonCycleSolver* c ) {}
     virtual void visit( SimpleNbox* c ) {}
     virtual void visit( HalocarbonComponent* c ) {}

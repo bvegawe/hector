@@ -108,6 +108,19 @@ enum unit_types {
                     
                     U_YRS,                  // Years
 
+		    U_M_YR_C,		    // m/yr/degC
+		    U_M,		    // m
+		    U_M_C,		    // m/degC
+		    U_1_YR,		    // 1/yr
+		    U_1_YR_C,		    // 1/yr/degC
+		    U_DEGC_DEGC,	    // degC/degC
+		    U_M05,		    // m^0.5
+		    U_1_DEGC,		    // 1/degC
+		    U_1_M05_YR05,	    // 1/m^0.5/yr^0.5
+		    U_M_YR,		    // m/yr   
+	            U_1_M_YR,		    // 1/m/yr
+		    U_KG_M3_K,		    // kg/m3/K
+
                     U_UNDEFINED             // Undefined units,
                                             // Warning: all units should be defined
                                             // before U_UNDEFINED

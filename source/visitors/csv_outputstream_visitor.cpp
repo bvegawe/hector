@@ -22,6 +22,7 @@
 #include "components/bc_component.hpp"
 #include "components/oc_component.hpp"
 #include "components/slr_component.hpp"
+#include "components/slr_brick_component.hpp"
 #include "components/o3_component.hpp"
 #include "components/oh_component.hpp"
 #include "components/ch4_component.hpp"
@@ -243,6 +244,17 @@ void CSVOutputStreamVisitor::visit( slrComponent* c ) {
         STREAM_MESSAGE_DATE( csvFile, c, D_SL_RC_NO_ICE, current_date );
         STREAM_MESSAGE_DATE( csvFile, c, D_SLR_NO_ICE, current_date );
     }
+}
+
+//------------------------------------------------------------------------------
+// documentation is inherited
+void CSVOutputStreamVisitor::visit( slrBRICKComponent* c ) {
+    if( !core->outputEnabled( c->getComponentName() ) ) return;
+    STREAM_MESSAGE( csvFile, c, D_SLR );
+    STREAM_MESSAGE( csvFile, c, D_SLR_GSIC );
+    STREAM_MESSAGE( csvFile, c, D_SLR_TE );
+    STREAM_MESSAGE( csvFile, c, D_SLR_GIS );
+    STREAM_MESSAGE( csvFile, c, D_SLR_AIS );
 }
 
 //------------------------------------------------------------------------------

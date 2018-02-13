@@ -96,6 +96,7 @@
 
 #define FORCING_COMPONENT_NAME	"forcing"
 #define SLR_COMPONENT_NAME "slr"
+#define SLR_BRICK_COMPONENT_NAME "slr_brick"
 #define OZONE_COMPONENT_NAME "ozone"
 
 #define DUMMY_COMPONENT_NAME "dummy-component"

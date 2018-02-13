@@ -115,7 +115,28 @@ string unitval::unitsName( const unit_types u ) {
         break;
     case U_YRS: return "Years";
         break;
-        
+    case U_M_YR_C: return "m/yr/degC";
+        break;
+    case U_M: return "m";
+        break;
+    case U_M_C: return "m/degC";
+        break;
+    case U_1_YR: return "1_yr";
+        break;
+    case U_1_YR_C: return "1_yr_degC";
+        break;
+    case U_DEGC_DEGC: return "degC/degC";
+        break;
+    case U_M05: return "m^0.5";
+        break;
+    case U_1_DEGC: return "1_degC";
+        break;       
+    case U_1_M05_YR05: return "1_m^0.5_yr^0.5";
+        break;
+    case U_1_M_YR: return "1_M_YR";
+        break;
+    case U_KG_M3_K: return "kg/m3/K";
+        break;        
     default: H_THROW( "Unhandled unit!" );
     }
 }
