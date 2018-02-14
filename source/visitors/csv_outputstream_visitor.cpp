@@ -250,11 +250,13 @@ void CSVOutputStreamVisitor::visit( slrComponent* c ) {
 // documentation is inherited
 void CSVOutputStreamVisitor::visit( slrBRICKComponent* c ) {
     if( !core->outputEnabled( c->getComponentName() ) ) return;
-    STREAM_MESSAGE( csvFile, c, D_SLR );
-    STREAM_MESSAGE( csvFile, c, D_SLR_GSIC );
-    STREAM_MESSAGE( csvFile, c, D_SLR_TE );
-    STREAM_MESSAGE( csvFile, c, D_SLR_GIS );
-    STREAM_MESSAGE( csvFile, c, D_SLR_AIS );
+    if( !in_spinup ) {
+        STREAM_MESSAGE( csvFile, c, D_SLR );
+        STREAM_MESSAGE( csvFile, c, D_SLR_GSIC );
+        STREAM_MESSAGE( csvFile, c, D_SLR_TE );
+        STREAM_MESSAGE( csvFile, c, D_SLR_GIS );
+        STREAM_MESSAGE( csvFile, c, D_SLR_AIS );
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -234,7 +234,7 @@
 #define D_SL_RC_NO_ICE          "sl_rc_no_ice"
 #define D_SLR_NO_ICE            "slr_no_ice"
 
-+// slr-brick component
+// slr-brick component
 #define D_SLR_GSIC              "slr_gsic"
 #define D_SLR_TE                "slr_te"
 #define D_SLR_GIS               "slr_gis"

@@ -66,8 +66,6 @@ subroutine init_brick_tee(h_capacity, expansion_coeff, &
 
     real(DP), intent(OUT) :: thermal
     
-    print *,"init_brick_tee, c, a: ", h_capacity," | ", expansion_coeff, " | "
-
 ! Assign values to model parameters
     c       = h_capacity
     a       = expansion_coeff

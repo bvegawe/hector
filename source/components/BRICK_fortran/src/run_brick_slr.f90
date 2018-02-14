@@ -139,7 +139,6 @@ subroutine run_brick(ns, tstep, &
     Tfrz = dais_parameters(12)
 
     i=1
-    print *,luse_tee
     call init_brick(i, tstep, &
                     gsic_magicc_beta0, gsic_magicc_V0, gsic_magicc_n, &
                     gsic_magicc_Teq, gsic_magicc_Gs0, sl_gsic_out(i), &
@@ -154,7 +153,6 @@ subroutine run_brick(ns, tstep, &
 
 ! forward integration, from beginning to end of simulation
     do i=2,ns
-        print *,"ocheat,luse_tee: ",delta_ocheat_in(i-1),"|",luse_tee
         ! step the model forward
         call brick_step_forward(i, temp_forcing_in(i-1), delta_ocheat_in(i-1), luse_tee, &
                                 sl_gsic_out(i-1), sl_gsic_out(i), &

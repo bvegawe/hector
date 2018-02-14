@@ -15,6 +15,9 @@
 *.dylib
 *.dll
 
+# Compiled module files
+*.mod
+
 # Compiled Static libraries
 *.lai
 *.la

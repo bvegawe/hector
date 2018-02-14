@@ -2,7 +2,7 @@
 all: obj dais.so simple.so brick_te.so brick_tee.so gsic_magicc.so libbrick.so
 
 # Fortran compiler:
-F90 = /usr/bin/gfortran # g95
+F90 = $(shell which gfortran) # g95
 
 # Directories: objpath, srcpath
 OP = ./obj
@@ -96,4 +96,4 @@ $(OP)/global.o: $(SP)/global.f90
 
 #Cleaning up
 clean:
-	rm -f $(OP)/*.o $(OP)/*.mod $(OP)/*.F90
+	rm -f ./*.so ./*.mod $(OP)/*.o $(OP)/*.mod $(OP)/*.F90

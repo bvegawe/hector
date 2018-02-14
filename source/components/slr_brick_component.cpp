@@ -15,7 +15,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include "components/slr_brick_component.hpp"
-#include "components/temp_doeclim_component.hpp"
+#include "components/temperature_component.hpp"
 #include "core/core.hpp"
 #include "core/dependency_finder.hpp"
 #include "h_util.hpp"
@@ -94,7 +94,7 @@ string slrBRICKComponent::getComponentName() const {
 // documentation is inherited
 void slrBRICKComponent::init( Core* coreptr ) {
     
-    logger.open( getComponentName(), false, Logger::DEBUG );
+    logger.open( getComponentName(), false, Logger::getGlobalLogger().getEchoToFile(), Logger::getGlobalLogger().getMinLogLevel() );
     H_LOG( logger, Logger::DEBUG ) << "hello " << getComponentName() << std::endl;
     
     core = coreptr;
@@ -304,7 +304,7 @@ void slrBRICKComponent::prepareToRun() throw ( h_exception ) {
 
 // Tony TODO
 // set in here the constants for BRICK
-// define them in here: ./headers/components/temp_doeclim_component.hpp
+// define them in here: ./headers/components/temperature_component.hpp
 
     dt = 1.0;                // years per timestep (this is hard-coded into Hector)
     slope_Ta2Tg = 0.8364527; // slope and intercept between global mean and Antarctic surface temp
@@ -418,9 +418,8 @@ void slrBRICKComponent::run( const double runToDate ) throw ( h_exception ) {
 
     //tgav.set( runToDate, core->sendMessage( M_GETDATA, D_GLOBAL_TEMP ) );	// store global temperature
     tgav[tstep] = double(core->sendMessage( M_GETDATA, D_GLOBAL_TEMP ).value( U_DEGC ));   
-    delta_ocheat[tstep] = (double(core->sendMessage( M_GETDATA, D_FLUX_MIXED ).value( U_W_M2 )) + 
-			   double(core->sendMessage( M_GETDATA, D_FLUX_INTERIOR ).value(U_W_M2 ))) *
-			  interior_area_frac * sa_tee * secs_per_Year;		// store delta ocheat
+    delta_ocheat[tstep] = double(core->sendMessage( M_GETDATA, D_HEAT_FLUX ).value( U_W_M2 )) * 
+			  sa_tee * secs_per_Year;		// store delta ocheat
     
     if(tstep > 0){
 	//H_LOG( logger, Logger::DEBUG ) << "executing run_brick_ " << runToDate << " " << ns << std::endl;
