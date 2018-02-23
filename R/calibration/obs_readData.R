@@ -140,7 +140,7 @@ ipcc_te_obs = list(trends = trends.te, norm.lower = norm.lower, norm.upper = nor
 dat = read.csv("obs_constraints/slr/Greenland_OBS_MAR_InSAR_updated.csv")
 obs.gis.time = dat[1:52,9]
 obs.gis = dat[1:52,12] # Annual mass balance in meters sea level equivalence
-obs.gis.err = dat[1,15]
+obs.gis.err = rep( dat[1,15], length(obs.gis) )
 
 idx = compute_indices(obs.time=obs.gis.time, mod.time=mod.time)
 oidx.gis = idx$oidx; midx.gis = idx$midx

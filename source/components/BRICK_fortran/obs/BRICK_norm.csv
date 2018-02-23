@@ -1,0 +1,9 @@
+# These are the observational averages from t0-tf.
+# BRICK subcomponents assume these normalizations for their inputs 
+# (and that can't be done just using Hector, which 
+# runs sequentially in time).
+# Subtract these from the subcomponent inputs in brick_slr.f90. 
+"","temp.gsic","temp.te","temp.simple","temp.dais","sl.dais"
+"t0",1850,1850,1960,1850,1961
+"tf",1870,1870,1990,1870,1990
+"avg",-6.60685698858354e-18,-6.60685698858354e-18,0.322411674347158,-6.60685698858354e-18,0.122458571428571

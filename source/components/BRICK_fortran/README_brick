@@ -1,0 +1,22 @@
+This folder includes fortran code to run the BRICK sea-level rise model.
+Parameters are passed in from ../slr_brick_component.cpp.
+SLR contributions from the BRICK subcomponents, as well as the overall
+global SLR, are returned.
+More on BRICK:
+ Copyright 2016 Tony Wong, Alexander Bakker
+ BRICK is free software and a stand-alone version is available at:
+ https://github.com/scrim-network/BRICK
+ Model description in Wong et al. (2017). doi:10.5194/gmd-10-2741-2017.
+
+
+./src - Includes all source files
+
+./obs - Includes the observation datasets used to normalize
+        subcomponent inputs. Each subcomponent requires temperature
+        relative to some time period, and the Antarctic ice sheet
+        component requires normalized SLR.
+
+Before using BRICK in Hector, you should -
+    - Enter this directory
+    - $ make clean
+    - $ make

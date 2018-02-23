@@ -110,7 +110,9 @@ subroutine init_brick(nstep, tstep_in, &
     sl_gis_init_out = V0_simple_in - vol_gis_init_out
 
 ! AIS-DAIS
-    sea_level_noAIS = sl_gsic_init_out + sl_te_init_out + sl_gis_init_out
+    ! Sea level relative to 1961-1990 observational average (see ../obs
+    ! directory for the calculation).
+    sea_level_noAIS = sl_gsic_init_out + sl_te_init_out + sl_gis_init_out - 0.1225
     call init_dais(tstep, parameters_dais_in, sea_level_noAIS, &
                    rad_ais_init_out, vol_ais_init_out )
     sl_ais_init_out = 0.0d0
@@ -206,7 +208,9 @@ subroutine brick_step_forward(nstep, temp_forcing_previous, delta_ocheat_previou
     END IF
 
 ! GIS-SIMPLE
-    call simple_step_forward(temp_forcing_previous, vol_gis_previous, vol_gis_current)
+! Temperatures are taken relative to the 1961-1990 observational average (see
+! ../obs directory for the calculation).
+    call simple_step_forward(temp_forcing_previous - 0.3224, vol_gis_previous, vol_gis_current)
     sl_gis_current = sl_gis_previous + (vol_gis_previous - vol_gis_current)
 
 ! AIS-DAIS
@@ -214,9 +218,12 @@ subroutine brick_step_forward(nstep, temp_forcing_previous, delta_ocheat_previou
     change_sea_level_noAIS = 1.0d0*(sl_gsic_current - sl_gsic_previous) + &
                              1.0d0*(sl_te_current   - sl_te_previous)   + &
                              1.0d0*(sl_gis_current  - sl_gis_previous)
+    ! Sea level relative to 1961-1990 observational average (see ../obs
+    ! directory for the calculation).
     sea_level_noAIS_previous = 1.0d0*sl_gsic_previous + &
                                1.0d0*sl_te_previous   + &
-                               1.0d0*sl_gis_previous
+                               1.0d0*sl_gis_previous  - &
+                               0.1225
 
     ! scale temperatures, accounting for relative to 1850
     ctmp = (Tfrz-b_anto)/a_anto
