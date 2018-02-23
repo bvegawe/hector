@@ -37,7 +37,7 @@ log.lik = function( parameters.in    , parnames.in , in.hector.in,
 		    sections.in      , chain.str   , calib.folder, 
 		    forcing.in       , ini.template, output.vars , 
 		    output.components, mod.time    , l.project   ,
-		    oidx, midx, obs, obs.err, ind.norm.data      )
+		    trends, oidx, midx, obs, obs.err, ind.norm.data)
 {
         parvals = parameters.in
 
@@ -77,15 +77,33 @@ log.lik = function( parameters.in    , parnames.in , in.hector.in,
         for ( i in 2:length( names(model.out) ) ) { # Time is the first list item here
 	    ts = names( model.out ) [i]
 
-            if( !is.na( ind.norm.data[match(ts,ind.norm.data[,1]),2] ) ) {
-                itmp = ind.norm.data[match(ts,ind.norm.data[,1]),2]:ind.norm.data[match(ts,ind.norm.data[,1]),3]
-                model.out[[ts]] = model.out[[ts]] - mean(model.out[[ts]][itmp])
+            ##Trend residuals. Trend arrays are described in obs_readData.R
+            if( !is.null( trends[[ts]] ) ) {
+                t = trends[[ts]]
+                tmod = rep( 0, nrow(t) )
+                for ( i in 1:nrow(t) ) {
+                    x = seq( t[i,6], t[i,7] )
+                    y = model.out[[ts]][ t[i,6] : t[i,7] ]
+                    barx = mean(x)
+                    bary = mean(y)
+                    tmod[i] = sum( ( x - rep( barx, length(x) ) ) * ( y - rep( bary, length(y) ) ) ) /
+                              sum( ( x - rep( barx, length(x) ) )^2 )
+                }
+                resid.trends = tmod - t[,1]
+                err.trends = 0.5*( t[,3] - t[,2] )
+                llik.i = sum (dnorm(resid.trends, mean=rep(0,length(resid.trends)), sd = sqrt(err.trends^2), log=TRUE))
+            } else { #Time series residuals
+                if( !is.na( ind.norm.data[match(ts,ind.norm.data[,1]),2] ) ) {
+                    itmp = ind.norm.data[match(ts,ind.norm.data[,1]),2]:ind.norm.data[match(ts,ind.norm.data[,1]),3]
+                    model.out[[ts]] = model.out[[ts]] - mean(model.out[[ts]][itmp])
+                }
+                offset = parameters.in[match(paste0('offset',ts,'_obs'),paste0(parnames.in,sections.in))]
+                if( is.na( offset ) ) { offset = 0 }
+	        sigma = parameters.in[match(paste0('sigma'  ,ts,'_obs'),paste0(parnames.in,sections.in))]
+	        rho   = parameters.in[match(paste0('rho'    ,ts,'_obs'),paste0(parnames.in,sections.in))]
+                resid = obs[[ts]][oidx[[ts]]] - (model.out[[ts]][midx[[ts]]] + offset)
+	        llik.i = logl.ar1(resid,sigma,rho,obs.err[[ts]][oidx[[ts]]]) # AR(1)
             }
-            offset = parameters.in[match(paste0('offset',ts,'_obs'),paste0(parnames.in,sections.in))]
-	    sigma = parameters.in[match(paste0('sigma'  ,ts,'_obs'),paste0(parnames.in,sections.in))]
-	    rho   = parameters.in[match(paste0('rho'    ,ts,'_obs'),paste0(parnames.in,sections.in))]
-            resid = obs[[ts]][oidx[[ts]]] - (model.out[[ts]][midx[[ts]]] + offset)
-	    llik.i = logl.ar1(resid,sigma,rho,obs.err[[ts]][oidx[[ts]]]) # AR(1)
 	    llik = llik + llik.i # Currently, assume all likelihoods are independent! Big assumption!
         }
 
@@ -116,7 +134,7 @@ log.post = function(  parameters.in    , parnames.in   , in.hector.in,
 	              sections.in      , chain.str     , calib.folder, 
 		      forcing.in       , ini.template  , output.vars , 
 		      output.components, mod.time      , l.project   , 
-		      bound.lower.in   , bound.upper.in,
+		      bound.lower.in   , bound.upper.in, trends      ,
                       oidx, midx, obs, obs.err, ind.norm.data     )
 {
 
@@ -138,6 +156,7 @@ log.post = function(  parameters.in    , parnames.in   , in.hector.in,
 			      output.components=output.components,
 			      mod.time=mod.time,
                               l.project=l.project,
+                              trends=trends,
 			      oidx=oidx, midx=midx,
                               obs=obs  , obs.err=obs.err,
                               ind.norm.data             

@@ -62,4 +62,27 @@ temperature/
     (the same website as above also gives good explanation of what each column represents)
     (accessed on: 27 July 2016)
 ================================================================================
-
+slr/
+  GMSL_ChurchWhite2011_yr_2015.txt
+    Copied from BRICK.
+    Global mean sea level from Church and White (2011)
+    Extended to 2013 (by them), available at
+    http://www.cmar.csiro.au/sealevel/sl_data_cmar.html
+    Church, J.A. & White, N.J. Surv Geophys (2011) 32: 585.
+    doi:10.1007/s10712-011-9119-1
+    (accessed on: 15 July 2016)
+  GSICobservations_UPDATED.csv
+    Copied from BRICK.
+    Glacier & Small Ice Caps (GSIC) Data from National Snow & Ice Data Center (NSIDC)
+    http://nsidc.org/forms/G10002_or.html?major_version=1
+    Institute of Arctic and Alpine Research University of Colorado
+    (updated version - Occasional Paper No. 58 (2005))
+    (accessed on: 15 July 2016)
+  Greenland_OBS_MAR_InSAR_updated.csv
+    Copied from BRICK.
+    Greenland Ice Sheet (GIS) mass balance data. From
+    Sasgen, Ingo, et al. "Timing and origin of recent regional ice-mass loss
+    in Greenland." Earth and Planetary Science Letters 333 (2012): 293-303.
+    doi:10.1016/j.epsl.2012.03.033
+    (accessed on: 15 July 2016)
+================================================================================

@@ -15,7 +15,7 @@
 minimize_residuals_hector = function(	parameters.in, parnames.in , in.hector.in     ,
 					sections.in  , calib.folder, forcing.in       , 
 					ini.template , output.vars , output.components,   
-					mod.time     , l.project   ,
+					mod.time     , l.project   , trends           ,
 					oidx, midx, obs, obs.err, ind.norm.data )
 {
     parvals = parameters.in
@@ -56,14 +56,33 @@ minimize_residuals_hector = function(	parameters.in, parnames.in , in.hector.in 
     for ( i in 2:length( names(model.out) ) ) { # Time is the first list item here
         ts = names( model.out )[i]
 
-	if( !is.na( ind.norm.data[match(ts,ind.norm.data[,1]),2] ) ) {
-            itmp = ind.norm.data[match(ts,ind.norm.data[,1]),2]:ind.norm.data[match(ts,ind.norm.data[,1]),3]
-            model.out[[ts]] = model.out[[ts]] - mean(model.out[[ts]][itmp])
+        ##Trend residuals. Trend arrays are described in obs_readData.R
+        if( !is.null( trends[[ts]] ) ) {
+            t = trends[[ts]]
+            tmod = rep( 0, nrow(t) )
+            for ( i in 1:nrow(t) ) {
+                x = seq( t[i,6], t[i,7] )
+                y = model.out[[ts]][ t[i,6] : t[i,7] ]
+                barx = mean(x)
+                bary = mean(y)
+                tmod[i] = sum( ( x - rep( barx, length(x) ) ) * ( y - rep( bary, length(y) ) ) ) /
+                          sum( ( x - rep( barx, length(x) ) )^2 )
+            }
+            resid.trends = tmod - t[,1]
+            err.trends = 0.5*( t[,3] - t[,2] ) 
+            err.sum = err.sum + mean( abs( resid.trends / err.trends ) )
+        } else { #Time series residuals
+	    if( !is.na( ind.norm.data[match(ts,ind.norm.data[,1]),2] ) ) {
+                itmp = ind.norm.data[match(ts,ind.norm.data[,1]),2]:ind.norm.data[match(ts,ind.norm.data[,1]),3]
+                model.out[[ts]] = model.out[[ts]] - mean(model.out[[ts]][itmp])
+            }
+            
+            offset = parameters.in[match(paste0("offset",ts,"_obs"),paste0(parnames.in,sections.in))]
+            if( is.na( offset ) ) { offset = 0 }
+            err.sum = err.sum + sum( abs( obs[[ts]][oidx[[ts]]] - 
+				          ( model.out[[ts]][midx[[ts]]] + offset )    ) / 
+		                     obs.err[[ts]][oidx[[ts]]] )
         }
-        offset = parameters.in[match(paste0("offset",ts,"_obs"),paste0(parnames.in,sections.in))]
-        err.sum = err.sum + sum( abs( obs[[ts]][oidx[[ts]]] - 
-				      ( model.out[[ts]][midx[[ts]]] + offset )    ) / 
-		                 obs.err[[ts]][oidx[[ts]]] )
     }
     if(is.nan(err.sum)) err.sum=Inf
     

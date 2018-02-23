@@ -15,7 +15,7 @@
 # Hard-coded file locations
 # ==============================================================================
 # You will likely have to change this. Either an absolute location or relative to working.dir.
-EXECUTABLE = "../../../source/hector"
+EXECUTABLE = "../../../source/hector" #"../hector" #"../../../source/hector"
 # ==============================================================================
 
 # -----------------------------------------------------------------------------

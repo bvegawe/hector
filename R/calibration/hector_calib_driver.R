@@ -90,7 +90,7 @@ if( !file.exists( calib.folder ) ) { system( paste0( "mkdir ", calib.folder ) ) 
 ## Get the forcing data (before possible aerosol scaling)
 if( forcing.based ) {
     forcing.root = "obs_constraints/forcing/"
-    file = ifelse( !l.project, "forcing_hindcast.csv",
+    file = ifelse( !l.project, "forcing_hindcast.csv", #"forcing_hindcast_1850_2009.csv", #testing; dropping data before 1850
            ifelse( scenario == 2.6, "forcing_rcp26.csv",
   	   ifelse( scenario == 4.5, "forcing_rcp45.csv",
   	   ifelse( scenario == 6.0, "forcing_rcp6.csv" ,
@@ -125,8 +125,10 @@ print( paste0( "Calibration will include Hector runs from ", begyear, " to ", en
 ## Individual parameters are updated in hectorwrapper().
 ## Here we just change things that are the same for the entire calibration.
 source("subparam.R") # Useful function to replace param values in .ini file
-if(forcing.based){ template.default = "input_templates/default_forcing_nowrite.ini"
-} else { template.default = "input_templates/default_nowrite.ini" }
+#if(forcing.based){ template.default = "input_templates/default_forcing_nowrite.ini"
+#} else { template.default = "input_templates/default_nowrite.ini" }
+if(forcing.based){ template.default = "input_templates/brick_forcing_nowrite.ini"
+} else { template.default = "input_templates/brick_nowrite.ini" }
 lines = readLines(template.default)
 lines = gsub("obs_constraints/emissions/RCP45_emissions.csv", emissions.file, lines) #Replace default emissions file location
 lines = gsub("obs_constraints/emissions/volcanic_RF.csv",volcanic.file, lines) #Replace default volcanic emissions file location
@@ -166,10 +168,11 @@ source('obs_readData.R')
 ## Then gather up all the data/model indices for comparisons. use lists to avoid
 ## enormous amounts of input to the MCMC functions.
 ## Also gather actual observation/error values.
-midx = list(); oidx = list(); obs = list(); obs.err = list()
+trends = list(); midx = list(); oidx = list(); obs = list(); obs.err = list()
 norm.lower = list(); norm.upper = list()
 for ( i in 1:length(obs.ts) ) {
     ts = obs.ts[[i]]
+    trends[[ts]]     = obs.all[[ts]]$trends
     midx[[ts]]       = obs.all[[ts]]$midx
     oidx[[ts]]       = obs.all[[ts]]$oidx
     obs[[ts]]        = obs.all[[ts]]$obs
@@ -217,8 +220,8 @@ if(is.null(continue.mcmc)){
 			   forcing.in = forcing                 , ini.template = ini.template            ,
 			   output.vars = output.vars            , output.components = output.components  ,
 			   mod.time = mod.time                  , l.project = l.project                  , 
-		           oidx = oidx, midx = midx             , obs = obs, obs.err = obs.err           ,
-                           ind.norm.data = ind.norm.data        )
+		           trends = trends                      , oidx = oidx, midx = midx               , 
+		           obs = obs, obs.err = obs.err         , ind.norm.data = ind.norm.data          )
 
     p0[index.DEoptim] = outDEoptim$optim$bestmem
     print("Finished DEoptim")
@@ -273,8 +276,8 @@ if( !parallel.mcmc ){
 		     output.components = output.components,
 		     mod.time = mod.time          , l.project = l.project       ,
 		     bound.lower.in = bound.lower , bound.upper.in = bound.upper,
-	             oidx = oidx, midx = midx     , obs = obs, obs.err = obs.err,
-		     ind.norm.data = ind.norm.data)
+	             trends = trends              , oidx = oidx, midx = midx    , 
+		     obs = obs, obs.err = obs.err , ind.norm.data = ind.norm.data)
   t.end=proc.time()											# save timing
   chain1 = amcmc.out1$samples
   print(paste0(niter.mcmc," runs took: ",(t.end[3]-t.beg[3])/60.," min"))
@@ -297,8 +300,8 @@ if( parallel.mcmc ){	  #Not sure how to do this for Hector, not implemented for 
 			      output.components = output.components, 
                               mod.time = mod.time          , l.project = l.project           ,
                               bound.lower.in = bound.lower , bound.upper.in = bound.upper    ,
-                              oidx = oidx, midx = midx     , obs = obs, obs.err = obs.err    ,
-                              ind.norm.data = ind.norm.data)
+                              trends = trends              , oidx = oidx, midx = midx        , 
+                              obs = obs, obs.err = obs.err , ind.norm.data = ind.norm.data   )
   t.end=proc.time() # save timing
   print(paste0(nparallel.mcmc, "parallel chains of ", niter.mcmc," runs took: ",(t.end[3]-t.beg[3])/60.," min"))
   if( nparallel.mcmc == 1 ){
@@ -337,8 +340,8 @@ if( ( !parallel.mcmc | (nparallel.mcmc == 1) ) & gr.mcmc ){ #this section needed
 		     output.components = output.components,
                      mod.time = mod.time          , l.project = l.project       ,
                      bound.lower.in = bound.lower , bound.upper.in = bound.upper,
-                     oidx = oidx, midx = midx     , obs = obs, obs.err = obs.err,
-                     ind.norm.data = ind.norm.data)
+                     trends = trends              , oidx = oidx, midx = midx    , 
+                     obs = obs, obs.err = obs.err , ind.norm.data = ind.norm.data)
   t.end2 = proc.time()  # save timing
   print( paste0( niter.mcmc, " runs took: ", (t.end2[3]-t.beg2[3])/60., " min"))
   chain2 = amcmc.out2$samples
