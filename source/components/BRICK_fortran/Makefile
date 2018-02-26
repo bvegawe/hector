@@ -1,5 +1,5 @@
 # Define "all"
-all: obj dais.so simple.so brick_te.so brick_tee.so gsic_magicc.so libbrick.so
+all: obj dais_fastdyn.so simple.so brick_te.so brick_tee.so gsic_magicc.so libbrick.so
 
 # Fortran compiler:
 F90 = $(shell which gfortran) # g95
@@ -27,7 +27,7 @@ Flags = ${SOFlags} -fno-range-check #$(Modpath)
 obj:
 	mkdir -p $@
 
-dais.so: $(OP)/global.o $(OP)/dais.o $(OP)/run_dais.o
+dais_fastdyn.so: $(OP)/global.o $(OP)/dais_fastdyn.o
 	$(F90) -o $@ $(Flags) -shared $(Incl) $^
 
 simple.so: $(OP)/global.o $(OP)/simple.o $(OP)/run_simple.o
@@ -42,7 +42,7 @@ brick_tee.so: $(OP)/global.o $(OP)/brick_tee.o
 gsic_magicc.so: $(OP)/global.o $(OP)/gsic_magicc.o $(OP)/run_gsic_magicc.o
 	$(F90) -o $@ $(Flags) -shared $(Incl) $^
 
-libbrick.so: $(OP)/global.o $(OP)/dais.o $(OP)/brick_te.o $(OP)/brick_tee.o $(OP)/simple.o $(OP)/gsic_magicc.o $(OP)/brick.o $(OP)/run_brick.o
+libbrick.so: $(OP)/global.o $(OP)/dais_fastdyn.o $(OP)/brick_te.o $(OP)/brick_tee.o $(OP)/simple.o $(OP)/gsic_magicc.o $(OP)/brick.o $(OP)/run_brick.o
 	$(F90) -o $@ $(Flags) -shared $(Incl) $^
 
 # ==============================================================
@@ -53,15 +53,12 @@ libbrick.so: $(OP)/global.o $(OP)/dais.o $(OP)/brick_te.o $(OP)/brick_tee.o $(OP
 $(OP)/run_brick.o: $(OP)/global.o $(OP)/brick.o $(SP)/run_brick_slr.f90
 	$(F90) -c $(Flags) $(Incl) $(SP)/run_brick_slr.f90 -o $@
 
-$(OP)/brick.o: $(OP)/global.o $(OP)/dais.o $(OP)/brick_te.o $(OP)/brick_tee.o $(OP)/simple.o $(OP)/gsic_magicc.o $(SP)/brick_slr.f90
+$(OP)/brick.o: $(OP)/global.o $(OP)/dais_fastdyn.o $(OP)/brick_te.o $(OP)/brick_tee.o $(OP)/simple.o $(OP)/gsic_magicc.o $(SP)/brick_slr.f90
 	$(F90) -c $(Flags) $(Incl) $(SP)/brick_slr.f90 -o $@
 
 ## DAIS ##
-$(OP)/run_dais.o: $(OP)/global.o $(OP)/dais.o $(SP)/run_dais.f90
-	$(F90) -c $(Flags) $(Incl) $(SP)/run_dais.f90 -o $@
-
-$(OP)/dais.o: $(OP)/global.o $(SP)/dais.f90
-	$(F90) -c $(Flags) $(Incl) $(SP)/dais.f90 -o $@
+$(OP)/dais_fastdyn.o: $(OP)/global.o $(SP)/dais_fastdyn.f90
+	$(F90) -c $(Flags) $(Incl) $(SP)/dais_fastdyn.f90 -o $@
 
 ## SIMPLE ##
 $(OP)/run_simple.o: $(OP)/global.o $(OP)/simple.o $(SP)/run_simple.f90

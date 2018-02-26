@@ -7,7 +7,9 @@
 ## in time), we approximate the offsets with the observed offsets.
 ##
 ## The values in the output csv are hard-coded into src/brick_slr.f90 (currently
-## at lines 211 and 224).
+## input the simple temperature offset in the simple_step_forward call;
+## input the ais slr offset when setting sea_level_noAIS_previous and
+## sea_level_noAIS).
 ##==============================================================================
 
 t0.hector = 1850. # Normalize obs to this year to ~match Hector offset.

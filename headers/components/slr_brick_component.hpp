@@ -83,6 +83,7 @@ private:
     std::vector<double> vol_gis_out;
     std::vector<double> rad_ais_out;
     std::vector<double> vol_ais_out;
+    std::vector<double> disint_ais_out;
     std::vector<double> sl_out;
     std::vector<double> sl_gsic_out;
     std::vector<double> sl_te_out;
@@ -102,6 +103,7 @@ private:
     double Aoc;                         // area of ocean surface, m2
     double lf;                          // mean AIS sea-level rise fingerprint at AIS shore, -
     double includes_dSLais;		// whether AIS is part of SLR rate passed to AIS model. l244 in BRICK_coupledModel.R sets to 0 for full-BRICK runs, -
+    double Vmin;                        // minimum volume, below which no more ice to disintegrate in AIS, m3
     double c_tee;			// heat capacity of conservative temperatures, from McDougle (2013)
     double rho_tee;			// ocean-average density kg/m3
     double sa_tee;			// same as Aoc above
@@ -158,13 +160,15 @@ private:
     unitval mu_dais;                    // profile parameter for parabolic ice surface (related to ice stress), m0.5
     unitval h0_dais;                    // height of runoff line at AIS surface temperaure of 0 deg C, m
     unitval c_dais;                     // temperaure sensitivity of runoff line height, m/deg C
-    unitval chr_dais;                   // uncertainty parameter for runoff line height, unitless
     unitval P0_dais;                    // annual precipitation for AIS surf temp Ta=0, m (ice equivalent)
     unitval kappa_dais;                 // coefficient for exponential dependency of precip on Ta, 1/degC
     unitval nu_dais;                    // propportionality constant relating runoff to precip, 1/m0.5 1/yr0.5
     unitval f0_dais;                    // proportionality constant for ice flow at groudning line, m/yr
     unitval gamma_dais;                 // power for relation of ice flow speed to water depth, -
     unitval alpha_dais;                 // partition parameter for efect of ocean subsurf temp on ice flux, -
+    unitval luse_aisfastdyn;            // whether to use the fast dynamics emulator
+    unitval Tcrit_dais;                 // trigger temperature, at which disintegration occurs, deg C
+    unitval lambda_dais;                // disintegration rate, m/yr
 
     double a_anto_dbl;
     double b_anto_dbl;
@@ -180,7 +184,10 @@ private:
     double f0_dais_dbl;
     double gamma_dais_dbl;
     double alpha_dais_dbl;
-    double daispar[21];	
+    int luse_aisfastdyn_int;
+    double Tcrit_dais_dbl;
+    double lambda_dais_dbl;
+    double daispar[23];	
         //! pointers to other components and stuff
     Core *core;
 

@@ -262,13 +262,15 @@
 #define D_MU_DAIS               "mu_dais"
 #define D_H0_DAIS               "h0_dais"
 #define D_C_DAIS                "c_dais"
-#define D_CHR_DAIS              "chr_dais"
 #define D_P0_DAIS               "P0_dais"
 #define D_KAPPA_DAIS            "kappa_dais"
 #define D_NU_DAIS               "nu_dais"
 #define D_F0_DAIS               "f0_dais"
 #define D_GAMMA_DAIS            "gamma_dais"
+#define D_LUSE_AISFASTDYN       "luse_aisfastdyn"
 #define D_ALPHA_DAIS            "alpha_dais"
+#define D_TCRIT_DAIS            "Tcrit_dais"
+#define D_LAMBDA_DAIS           "lambda_dais"
 
 // so2 component
 #define D_NATURAL_SO2       "SN"

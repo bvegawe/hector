@@ -33,7 +33,7 @@ module brick
 
 ! variables
     real(DP) :: tstep
-
+    logical  :: use_aisfastdyn
 ! public subroutines
     public :: brick_step_forward, init_brick
 
@@ -47,7 +47,8 @@ subroutine init_brick(nstep, tstep_in, &
                       c_tee_in, a_tee_in, rho_tee_in, sa_tee_in, luse_tee, &
                       a_simple_in, b_simple_in, alpha_simple_in, beta_simple_in, &
                       V0_simple_in, sl_gis_init_out, vol_gis_init_out, &
-                      parameters_dais_in, sl_ais_init_out, rad_ais_init_out, vol_ais_init_out, &
+                      luse_aisfastdyn, parameters_dais_in, sl_ais_init_out, & 
+                      rad_ais_init_out, vol_ais_init_out, disint_ais_init_out, &
                       sl_init_out)
 !  =========================================================================
 !   Initialize the BRICK parameters and initial variables
@@ -75,7 +76,8 @@ subroutine init_brick(nstep, tstep_in, &
     real(DP), intent(IN) :: alpha_simple_in
     real(DP), intent(IN) :: beta_simple_in
     real(DP), intent(IN) :: V0_simple_in
-    real(DP), dimension(21), intent(IN) :: parameters_dais_in
+    integer(i4b), intent(IN) :: luse_aisfastdyn
+    real(DP), dimension(23), intent(IN) :: parameters_dais_in
 
     real(DP), intent(OUT) :: sl_gsic_init_out
     real(DP), intent(OUT) :: sl_te_init_out
@@ -84,6 +86,7 @@ subroutine init_brick(nstep, tstep_in, &
     real(DP), intent(OUT) :: sl_ais_init_out
     real(DP), intent(OUT) :: rad_ais_init_out
     real(DP), intent(OUT) :: vol_ais_init_out
+    real(DP), intent(OUT) :: disint_ais_init_out
     real(DP), intent(OUT) :: sl_init_out
 
     real(DP) :: sea_level_noAIS
@@ -113,8 +116,15 @@ subroutine init_brick(nstep, tstep_in, &
     ! Sea level relative to 1961-1990 observational average (see ../obs
     ! directory for the calculation).
     sea_level_noAIS = sl_gsic_init_out + sl_te_init_out + sl_gis_init_out - 0.1225
-    call init_dais(tstep, parameters_dais_in, sea_level_noAIS, &
-                   rad_ais_init_out, vol_ais_init_out )
+
+    IF (luse_aisfastdyn .EQ. 1) THEN
+        use_aisfastdyn = .TRUE.
+    ELSE
+        use_aisfastdyn = .FALSE.
+    END IF
+
+    call init_dais(tstep, parameters_dais_in, sea_level_noAIS, use_aisfastdyn, &
+                   rad_ais_init_out, vol_ais_init_out, disint_ais_init_out )
     sl_ais_init_out = 0.0d0
 
 ! GMSL
@@ -130,8 +140,9 @@ subroutine brick_step_forward(nstep, temp_forcing_previous, delta_ocheat_previou
                               sl_te_previous, sl_te_current, &
                               sl_gis_previous, vol_gis_previous, sl_gis_current, vol_gis_current, &
                               a_anto, b_anto, slope_Ta2Tg, intercept_Ta2Tg, &
-                              sl_ais_previous, rad_ais_previous, vol_ais_previous, &
+                              sl_ais_previous, rad_ais_previous, vol_ais_previous, & 
                               sl_ais_current, rad_ais_current, vol_ais_current, &
+                              disint_ais_current, &
                               sl_previous, sl_current)
 !------------------------------------------------------------------------------
 ! Calculate current state from previous state
@@ -160,6 +171,7 @@ subroutine brick_step_forward(nstep, temp_forcing_previous, delta_ocheat_previou
 !  sl_gis_current       current time step cumulative GIS contribution to SL [m]
 !  rad_ais_current      current time step Antarctic ice sheet radius [m]
 !  vol_ais_current      current time step Antarctic ice sheet volume [m^3]
+!  disint_ais_current   current time step Antarctic ice sheet disintegration [m SLE]
 !  sl_ais_current       current time step cumulative AIS contribution to SL [m]
 !  sl_current           current time step total sea level [m]
 !------------------------------------------------------------------------------
@@ -190,6 +202,7 @@ subroutine brick_step_forward(nstep, temp_forcing_previous, delta_ocheat_previou
     real(DP), intent(OUT) :: sl_ais_current
     real(DP), intent(OUT) :: rad_ais_current
     real(DP), intent(OUT) :: vol_ais_current
+    real(DP), intent(OUT) :: disint_ais_current
     real(DP), intent(OUT) :: sl_current
 
     real(DP) :: change_sea_level_noAIS, sea_level_noAIS_previous
@@ -231,7 +244,8 @@ subroutine brick_step_forward(nstep, temp_forcing_previous, delta_ocheat_previou
     Ta_previous = (temp_forcing_previous - intercept_Ta2Tg)/slope_Ta2Tg
 
     call dais_step( Ta_previous, sea_level_noAIS_previous, Toc_previous, &
-                    change_sea_level_noAIS, rad_ais_current, vol_ais_current)
+                    change_sea_level_noAIS, rad_ais_current, vol_ais_current, &
+                    disint_ais_current )
     sl_ais_current = sl_ais_previous + &
                      (57.0d0 - sl_ais_previous)*(1.0d0 - (vol_ais_current/vol_ais_previous))
     

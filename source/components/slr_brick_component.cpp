@@ -48,18 +48,18 @@ extern "C" {
 //               double *sl_ais_out , double *sl_out);
 void run_brick_ (int *ns, double *tstep, double *temperature_tseries,
 		double *delta_ocheat_tseries,
-		double *beta0_gsic , double *V0_gsic     , double *n_gsic      ,
-		double *Gs0_gsic   , double *Teq_gsic    , double *sl_gsic_out ,
-		double *a_te       , double *b_te        , double *invtau_te   , 
-                double *V0_te      , double *sl_te_out   , 
-		double *c_tee	   , double *a_tee	 , double *rho_tee     ,
-	        double *sa_tee     , int *luse_tee       ,
-		double *a_simple   , double *b_simple    , double *alpha_simple,
-		double *beta_simple, double *V0_simple   , double *sl_gis_out  ,
-		double *vol_gis_out,
-		double *a_anto     , double *b_anto      , double *slope_Ta2tg ,
+		double *beta0_gsic    , double *V0_gsic     , double *n_gsic      ,
+		double *Gs0_gsic      , double *Teq_gsic    , double *sl_gsic_out ,
+		double *a_te          , double *b_te        , double *invtau_te   , 
+                double *V0_te         , double *sl_te_out   , 
+		double *c_tee	      , double *a_tee	  , double *rho_tee     ,
+	        double *sa_tee        , int *luse_tee       ,
+		double *a_simple      , double *b_simple    , double *alpha_simple,
+		double *beta_simple   , double *V0_simple   , double *sl_gis_out  ,
+		double *vol_gis_out   ,
+		double *a_anto        , double *b_anto      , double *slope_Ta2tg ,
 		double *intercept_Ta2Tg, 
-		double daispar[21] ,
+		int *luse_aisfastdyn  , double daispar[23]  ,
                 //double *b0_dais    , double *slope_dais  , double *mu_dais     , 
 		//double *h0_dais    , double *c_dais      , double *P0_dais     , 
 		//double *kappa_dais  , double *nu_dais    , double *f0_dais     , 
@@ -67,8 +67,9 @@ void run_brick_ (int *ns, double *tstep, double *temperature_tseries,
 		//double *rho_w       , double *rho_i      , double *rho_m       , 
 		//double *Toc0        , double *Rad0       , double *Aoc         , 
 		//double *lf	    , double *includes_dSLais , double *chr_dais  ,
-		double *sl_ais_out  , double *rad_ais_out, double *vol_ais_out ,
-		double *sl_out	    );
+		double *sl_ais_out    , double *rad_ais_out, double *vol_ais_out ,
+		double *disint_ais_out, 
+                double *sl_out	      );
 }
 
 //------------------------------------------------------------------------------
@@ -151,11 +152,12 @@ void slrBRICKComponent::init( Core* coreptr ) {
     P0_dais.set( 0.35 , U_M);               // annual precipitation for AIS surf temp Ta=0, m (ice equivalent)
     kappa_dais.set( 0.04 , U_1_DEGC);       // coefficient for exponential dependency of precip on Ta, 1/degC
     nu_dais.set( 0.012 , U_1_M05_YR05);     // proportionality constant relating runoff to precip, 1/m0.5 1/yr0.5
-    f0_dais.set( 1.2 , U_M_YR);             // proportionality constant for ice flow at groudning line, m/yr
+    f0_dais.set( 1.2 , U_M_YR);             // proportionality constant for ice flow at grounding line, m/yr
     gamma_dais.set( 2.5 , U_UNITLESS);      // power for relation of ice flow speed to water depth, -
     alpha_dais.set( 0.5 , U_UNITLESS);      // partition parameter for efect of ocean subsurf temp on ice flux, -
-    chr_dais.set( 1.0 , U_UNITLESS);        // runoff line height uncertainty parameter, unitless
-
+    luse_aisfastdyn.set( 1, U_UNITLESS);    // whether to use the AIS fast dynamics emulator
+    Tcrit_dais.set( -15.0, U_DEGC);         // trigger temperature, at which disintegration occurs, deg C
+    lambda_dais.set( 0.01, U_M_YR);         // disintegration rate, m/yr
 }
 
 //------------------------------------------------------------------------------
@@ -261,9 +263,6 @@ void slrBRICKComponent::setData( const string& varName,
         } else if( varName == D_C_DAIS ) {
             H_ASSERT( data.date == Core::undefinedIndex(), "date not allowed" );
             c_dais = unitval::parse_unitval( data.value_str, data.units_str, U_M_C );
-        } else if( varName == D_CHR_DAIS ) {
-            H_ASSERT( data.date == Core::undefinedIndex(), "date not allowed" );
-            chr_dais = unitval::parse_unitval( data.value_str, data.units_str, U_UNITLESS );
         } else if( varName == D_P0_DAIS ) {
             H_ASSERT( data.date == Core::undefinedIndex(), "date not allowed" );
             P0_dais = unitval::parse_unitval( data.value_str, data.units_str, U_M );
@@ -282,6 +281,15 @@ void slrBRICKComponent::setData( const string& varName,
         } else if( varName == D_ALPHA_DAIS ) {
             H_ASSERT( data.date == Core::undefinedIndex(), "date not allowed" );
             alpha_dais = unitval::parse_unitval( data.value_str, data.units_str, U_UNITLESS );
+       } else if( varName == D_LUSE_AISFASTDYN ) {
+            H_ASSERT( data.date == Core::undefinedIndex(), "date not allowed" );
+            luse_aisfastdyn = unitval::parse_unitval( data.value_str, data.units_str, U_UNITLESS );            
+       } else if( varName == D_TCRIT_DAIS ) {
+            H_ASSERT( data.date == Core::undefinedIndex(), "date not allowed" );
+            Tcrit_dais = unitval::parse_unitval( data.value_str, data.units_str, U_DEGC );
+        } else if( varName == D_LAMBDA_DAIS ) {
+            H_ASSERT( data.date == Core::undefinedIndex(), "date not allowed" );
+            lambda_dais = unitval::parse_unitval( data.value_str, data.units_str, U_M_YR );
         } else {
             H_THROW( "Unknown variable name while parsing " + getComponentName() + ": "
                     + varName );
@@ -318,7 +326,8 @@ void slrBRICKComponent::prepareToRun() throw ( h_exception ) {
     Aoc = 3.619*pow(10.0,14.0); // ocean surface area, m2
     lf = -1.18;              // AIS shore mean AIS sea level fingerprint, -
     includes_dSLais = 0.0;   // whether AIS is part of SLR rate passed to AIS model. l244 in BRICK_coupledModel.R sets to 0 for full-BRICK runs, -
- 
+    Vmin = 19e15;            // minimum volume, below which there is no more ice to disintegrate (m^3), 18-20e15 
+
     c_tee   = 3991.86795711963; // heat capacity of conservative temperatures, from McDougle (2013)
     rho_tee = 1027.;	     // ocean-average density kg/m3
     sa_tee  = Aoc;            // ocean surface area, m2, from Eakins and Sharmin 2010
@@ -334,7 +343,7 @@ void slrBRICKComponent::prepareToRun() throw ( h_exception ) {
     daispar[17] = Aoc;
     daispar[18] = lf;
     daispar[19] = includes_dSLais;
-    
+    daispar[22] = Vmin;   
     // Convert unitval input parameters to doubles to pass to fortran function
     // GSIC
     beta0_gsic_dbl = double( beta0_gsic.value( U_M_YR_C ) );
@@ -371,7 +380,9 @@ void slrBRICKComponent::prepareToRun() throw ( h_exception ) {
     f0_dais_dbl = double( f0_dais.value( U_M_YR ) );
     gamma_dais_dbl = double( gamma_dais.value( U_UNITLESS ) );
     alpha_dais_dbl = double( alpha_dais.value( U_UNITLESS ) );
-    chr_dais_dbl = double( chr_dais.value( U_UNITLESS ) );   
+    luse_aisfastdyn_int = int( luse_aisfastdyn.value( U_UNITLESS ) );
+    Tcrit_dais_dbl = double( Tcrit_dais.value( U_DEGC ) );
+    lambda_dais_dbl = double( lambda_dais.value( U_M_YR ) );
     daispar[0] = b0_dais_dbl;
     daispar[1] = slope_dais_dbl;
     daispar[2] = mu_dais_dbl;
@@ -383,7 +394,8 @@ void slrBRICKComponent::prepareToRun() throw ( h_exception ) {
     daispar[8] = f0_dais_dbl;
     daispar[9] = gamma_dais_dbl;
     daispar[10] = alpha_dais_dbl;
-    daispar[20] = chr_dais_dbl;
+    daispar[20] = Tcrit_dais_dbl;
+    daispar[21] = lambda_dais_dbl;
 
     // Initializing all model components that depend on the number of timesteps (ns)
     ns = core->getEndDate() - core->getStartDate();
@@ -394,6 +406,7 @@ void slrBRICKComponent::prepareToRun() throw ( h_exception ) {
     vol_gis_out.resize(ns);
     rad_ais_out.resize(ns);
     vol_ais_out.resize(ns);
+    disint_ais_out.resize(ns);
     sl_gsic_out.resize(ns);
     sl_te_out.resize(ns);
     sl_gis_out.resize(ns);
@@ -451,7 +464,7 @@ void slrBRICKComponent::run( const double runToDate ) throw ( h_exception ) {
 		&b_simple_dbl   , &alpha_simple_dbl, &beta_simple_dbl  , 
 		&V0_simple_dbl  , &sl_gis_out[0]   , &vol_gis_out[0]   ,
 		&a_anto_dbl     , &b_anto_dbl      , &slope_Ta2Tg      , 
-		&intercept_Ta2Tg ,
+		&intercept_Ta2Tg,
                 //&b0_dais_dbl    , &slope_dais_dbl  , &mu_dais_dbl      ,
                 //&h0_dais_dbl    , &c_dais_dbl      , &P0_dais_dbl      , 
                 //&kappa_dais_dbl , &nu_dais_dbl     , &f0_dais_dbl      , 
@@ -459,9 +472,9 @@ void slrBRICKComponent::run( const double runToDate ) throw ( h_exception ) {
                 //&rho_w          , &rho_i           , &rho_m            , 
                 //&Toc0           , &Rad0            , &Aoc              , 
                 //&lf             , &includes_dSLais , &chr_dais_dbl     ,
-                &daispar[0]     ,
+                &luse_aisfastdyn_int, &daispar[0]      ,
                 &sl_ais_out[0]  , &rad_ais_out[0]  , &vol_ais_out[0]   ,
-                &sl_out[0]       );
+                &disint_ais_out[0], &sl_out[0]       );
   //-------------
 
  

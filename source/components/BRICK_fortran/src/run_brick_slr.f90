@@ -37,7 +37,8 @@ subroutine run_brick(ns, tstep, &
                      simple_a, simple_b, simple_alpha, &                       ! SIMPLE input/output
                      simple_beta, simple_V0, sl_gis_out, vol_gis_out, &
                      anto_a, anto_b, slope_Ta2Tg, intercept_Ta2Tg, &           ! DAIS input/output
-                     dais_parameters, sl_ais_out, rad_ais_out, vol_ais_out, &
+                     luse_aisfastdyn, dais_parameters, sl_ais_out, &
+                     rad_ais_out, vol_ais_out, disint_ais_out, &
                      sl_out)
 
 !===============================================================================
@@ -73,12 +74,14 @@ subroutine run_brick(ns, tstep, &
 !   anto_b              Toc when Tg=0
 !   slope_Ta2Tg         slope of regression of Tg (global) as linear function of Ta (antarctic)
 !   intercept_Ta2Tg     intercept of regression of Tg as a linear function of Ta
-!   dais_parameters     13 parameters for DAIS-ANTO model (details within the DAIS model structure)
+!   luse_aisfastdyn     whether to include fast dynamics of the WAIS (disintegration)
+!   dais_parameters     23 parameters for DAIS-ANTO model (details within the DAIS model structure)
 ! 
 ! Outputs:
 !   sl_te_out           sea-level rise relative to 1850 (or beg. of run) from thermal expansion [m SLE]
 !   sl_gis_out          sea-level rise relative to 1850 (or beg. of run) from Greenland ice sheet [m SLE]
 !   sl_ais_out          sea-level rise relative to 1850 (or beg. of run) from Antarctic ice sheet [m SLE]
+!   disint_ais_out      yearly disintegration of WAIS [m SLE]
 !   sl_gsic_out         sea-level rise relative to 1850 (or beg. of run) from glaciers and ice caps [m SLE]
 !   sl_out              sea-level rise relative to 1850 (or beg. of run), total [m]
 !===============================================================================
@@ -116,7 +119,8 @@ subroutine run_brick(ns, tstep, &
     real(DP),     intent(IN) :: anto_b
     real(DP),     intent(IN) :: slope_Ta2Tg
     real(DP),     intent(IN) :: intercept_Ta2Tg
-    real(DP), dimension(21), intent(IN) :: dais_parameters
+    integer(i4b), intent(IN) :: luse_aisfastdyn
+    real(DP), dimension(23), intent(IN) :: dais_parameters
 
 ! output variables
     real(DP), dimension(ns), intent(OUT) :: sl_gsic_out
@@ -126,6 +130,7 @@ subroutine run_brick(ns, tstep, &
     real(DP), dimension(ns), intent(OUT) :: sl_ais_out
     real(DP), dimension(ns), intent(OUT) :: rad_ais_out
     real(DP), dimension(ns), intent(OUT) :: vol_ais_out
+    real(DP), dimension(ns), intent(OUT) :: disint_ais_out
     real(DP), dimension(ns), intent(OUT) :: sl_out
 
     integer(i4b) :: i   ! time step counter
@@ -147,7 +152,8 @@ subroutine run_brick(ns, tstep, &
                     tee_c, tee_a, tee_rho, tee_sa, luse_tee, &
                     simple_a, simple_b, simple_alpha, simple_beta, &
                     simple_V0, sl_gis_out(i), vol_gis_out(i), &
-                    dais_parameters, sl_ais_out(i), rad_ais_out(i), vol_ais_out(i), &
+                    luse_aisfastdyn, dais_parameters, sl_ais_out(i), &
+                    rad_ais_out(i), vol_ais_out(i), disint_ais_out(i), &
                     sl_out(i))
 ! estimate outputs
 
@@ -161,7 +167,7 @@ subroutine run_brick(ns, tstep, &
                                 anto_a, anto_b, slope_Ta2Tg, intercept_Ta2Tg, &
                                 sl_ais_out(i-1), rad_ais_out(i-1), vol_ais_out(i-1), &
                                 sl_ais_out(i), rad_ais_out(i), vol_ais_out(i), &
-                                sl_out(i-1), sl_out(i))
+                                disint_ais_out(i), sl_out(i-1), sl_out(i))
 
     end do
 
