@@ -2,6 +2,14 @@
 
 Hector
 ======
+**Note for the dev_slr/ branch:**
+
+This branch includes an optional sea-level component (BRICK; https://github.com/scrim-network/BRICK; https://doi.org/10.5194/gmd-10-2741-2017) that includes contributions from polar ice sheets, glaciers, and thermosteric expansion. The build process is essentially unchanged with one extra step: the BRICK fortran code must be compiled before making the Hector executable:
+* $ cd source/components/BRICK_fortran/
+* $ make all
+
+**Back to the normal README**
+
 
 This is the repository for **Hector**, an open source, object-oriented, simple global climate carbon-cycle model. It  runs essentially instantaneously while still representing the most critical global scale earth system processes, and is one of a class of models heavily used for for emulating complex climate models and uncertainty analyses. For example, Hector's global temperature rise for the RCP 8.5 scenario, compared to observations and other model results, looks like this:
 
