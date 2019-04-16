@@ -1,6 +1,11 @@
 [![Build Status](https://travis-ci.org/JGCRI/hector.svg?branch=master)](https://travis-ci.org/JGCRI/hector)
 [![Build status](https://ci.appveyor.com/api/projects/status/2jmhvq7n2ap75u1o/branch/master?svg=true)](https://ci.appveyor.com/project/rplzzz/hector/branch/master)
 
+cloud_feedback
+=============
+
+This branch includes a simple accounting for aggregate cloud feedbacks with temperature. The changes are largely made in the src/forcing_component.cpp file. A simple temperature-dependent net cloud forcing is included, based on the relationships shown in Stephens (2004, doi/10.1175/JCLI-3243.1; Fig. 4).
+
 Hector
 ======
 
