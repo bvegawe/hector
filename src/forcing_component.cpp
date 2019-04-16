@@ -322,6 +322,29 @@ void ForcingComponent::run( const double runToDate ) throw ( h_exception ) {
             // Volcanic forcings
             forcings[D_RF_VOL] = core->sendMessage( M_GETDATA, D_VOLCANIC_SO2, message_data( runToDate ) );
         }
+	
+	// Rough estimate of preindustrial SST: 15.8 deg C.
+	// http://physics.oregonstate.edu/~hetheriw/projects/energy/topics/doc/environment/climate/Global_Surface_Temperature_Anomalies_NOAA.html
+	// corrected to preindustrial by looking at Hector hindcast average over 1880-2000. Roughly*
+	double sst = *RETRIEVE TANOMALY* + 15.8 + 273.15
+	sw_nh = 7.22*sst - 2188.89
+	if(sst > 278 & sst < 287.5){
+		sw_sh = -2.11*sst + 564.3
+	} else if(sst >= 287.5){
+		sw_sh = 2.17*sst - 664.88
+	}
+	cloud_sw = (sw_nh + sw_sh) / 2
+	
+	//Now longwave
+	if(sst > 274 & sst < 285){
+		cloud_lw = 33
+	} else if(sst >= 285 & sst < 298){
+		cloud_lw = -0.615*sst + 208.38
+	} else if(sst >= 298){
+		cloud_lw = 14*sst - 4147
+	}
+	total_cloud = cloud_sw + cloud_lw
+	forcings[D_RF_CLOUD].set( total_cloud, U_W_M2 )
         
         // ---------- Total ----------
         unitval Ftot( 0.0, U_W_M2 );  // W/m2
