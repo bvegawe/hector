@@ -2,37 +2,89 @@
 # BBL January 2017
 # See https://travis-ci.org/bpbond/hector
 
-language: cpp
+--- 
+matrix: 
+  include: 
+    - language: cpp
+      compiler: clang
 
-compiler:
-  - clang
-  - gcc
+      addons: 
+        apt: 
+          packages: 
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+          sources: 
+            - boost-latest
 
-branches:
-  only:
-  - master
-  - rc1.2
-  
-before_script:
- - export BOOSTVERSION=1_62_0
- - export BOOSTVERDIR=1.62.0
- - wget http://downloads.sourceforge.net/project/boost/boost/${BOOSTVERDIR}/boost_${BOOSTVERSION}.tar.bz2\?r\=\&ts\=1435589970\&use_mirror\=garr -O /tmp/boost.tar.bz2
- - tar jxf /tmp/boost.tar.bz2
- - mv boost_$BOOSTVERSION $PWD/boost-trunk
- - export BOOSTROOT="$PWD/boost-trunk"
+      # BOOSTROOT is set to look for header files in the default place
+      #where Ubuntu apt will install them --
+      #i.e. /usr/include/x86_64-linux-gnu. This is set because the
+      #Makefile has a `-I$(BOOSTROOT)` call.  Similarly, BOOSTLIB is
+      #set to /usr/lib/x86_64-linux-gnu, which is where Ubuntu apt
+      #installs boost by default. It has to be specified in full
+      #because otherwise, Hector's Makefile tries to construct
+      #BOOSTLIB by appending `/lib` to BOOSTROOT, which will not work
+      #here because of the `x86_64-linux-gnu` addition.
 
- - cd $BOOSTROOT
- - ./bootstrap.sh --with-libraries=filesystem 
- - ./b2
- - cd $TRAVIS_BUILD_DIR
+      before_script: 
+        - "export BOOSTROOT=/usr/include/x86_64-linux-gnu/"
+        - "export BOOSTLIB=/usr/lib/x86_64-linux-gnu/"
+      branches: 
+        only: 
+          - master
+          - rc1.2
+      script: 
+        - "make hector"
+        - "./test_hector.sh ./source/hector"
 
-# Code above is necessary because Travis's default Boost is 1_46_0
-# which doesn't include odeint and other stuff. Otherwise, we could
-# simple use the following lines:
-#  - sudo apt-get update -qq
-#  - sudo apt-get install libboost-dev libboost-filesystem-dev libboost-system-dev
+    - language: cpp
+      compiler: gcc
 
-script: 
- - make hector
- - ./test_hector.sh ./source/hector 
+      addons: 
+        apt: 
+          packages: 
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+          sources: 
+            - boost-latest
 
+      # BOOSTROOT is set to look for header files in the default place
+      #where Ubuntu apt will install them --
+      #i.e. /usr/include/x86_64-linux-gnu. This is set because the
+      #Makefile has a `-I$(BOOSTROOT)` call.  Similarly, BOOSTLIB is
+      #set to /usr/lib/x86_64-linux-gnu, which is where Ubuntu apt
+      #installs boost by default. It has to be specified in full
+      #because otherwise, Hector's Makefile tries to construct
+      #BOOSTLIB by appending `/lib` to BOOSTROOT, which will not work
+      #here because of the `x86_64-linux-gnu` addition.
+
+      before_script: 
+        - "export BOOSTROOT=/usr/include/x86_64-linux-gnu/"
+        - "export BOOSTLIB=/usr/lib/x86_64-linux-gnu/"
+      branches: 
+        only: 
+          - master
+          - rc1.2
+      script: 
+        - "make hector"
+        - "./test_hector.sh ./source/hector"
+
+
+    - language: r
+      addons: 
+        apt: 
+          packages: 
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+          sources: 
+            - boost-latest
+      cache: packages
+
+      # Automatically deploy Hector documentation on the gh-pages
+      # branch. This is based on this guide from `pkgdown`:
+      # https://pkgdown.r-lib.org/reference/deploy_site_github.html
+      before_deploy: Rscript -e 'remotes::install_cran("pkgdown")'
+      deploy:
+        provider: script
+        script: Rscript -e 'pkgdown::deploy_site_github()'
+        skip_cleanup: true
