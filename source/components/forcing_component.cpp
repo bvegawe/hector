@@ -332,8 +332,10 @@ void ForcingComponent::run( const double runToDate ) throw ( h_exception ) {
         if( Ftot_constrain.size() && runToDate <= Ftot_constrain.lastdate() ) {
             H_LOG( logger, Logger::WARNING ) << "** Overwriting total forcing with user-supplied value" << std::endl;
             forcings[ D_RF_TOTAL ] = Ftot_constrain.get( runToDate );
+            forcings[ D_RF_TOTAL_UNCONSTRAINED ] = Ftot;
         } else {
             forcings[ D_RF_TOTAL ] = Ftot;
+            forcings[ D_RF_TOTAL_UNCONSTRAINED ] = Ftot;
         }
         H_LOG( logger, Logger::DEBUG ) << "forcing total is " << forcings[ D_RF_TOTAL ] << std::endl;
         

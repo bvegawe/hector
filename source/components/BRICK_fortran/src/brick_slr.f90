@@ -223,7 +223,8 @@ subroutine brick_step_forward(nstep, temp_forcing_previous, delta_ocheat_previou
 ! GIS-SIMPLE
 ! Temperatures are taken relative to the 1961-1990 observational average (see
 ! ../obs directory for the calculation).
-    call simple_step_forward(temp_forcing_previous - 0.3224, vol_gis_previous, vol_gis_current)
+    call simple_step_forward(temp_forcing_previous - 0.3224, vol_gis_previous, vol_gis_current) !for hadcrut
+!    call simple_step_forward(temp_forcing_previous - 0.3209, vol_gis_previous, vol_gis_current) !for gistemp
     sl_gis_current = sl_gis_previous + (vol_gis_previous - vol_gis_current)
 
 ! AIS-DAIS

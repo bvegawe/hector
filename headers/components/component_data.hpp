@@ -40,6 +40,7 @@
 // forcing component
 #define D_RF_PREFIX             "F"
 #define D_RF_TOTAL              D_RF_PREFIX "tot"
+#define D_RF_TOTAL_UNCONSTRAINED D_RF_PREFIX "tot_unconstrained"
 #define D_RF_T_ALBEDO           D_RF_PREFIX "talbedo"
 #define D_FTOT_CONSTRAIN        D_RF_PREFIX "tot_constrain"
 #define D_RF_BASEYEAR           "baseyear"
