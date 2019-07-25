@@ -7,6 +7,7 @@ Hector
 This branch includes an optional sea-level component (BRICK; https://github.com/scrim-network/BRICK; https://doi.org/10.5194/gmd-10-2741-2017) that includes contributions from polar ice sheets, glaciers, and thermosteric expansion. The build process is essentially unchanged with one extra step: the BRICK fortran code must be compiled before making the Hector executable:
 * $ cd source/components/BRICK_fortran/
 * $ make all
+
 After creating libbrick.so in the BRICK_fortran folder, you may have to copy it to the same location as your hector executable (this seemed to be a requirement on my mac).
 * $ cp libbrick.so ../../
 
