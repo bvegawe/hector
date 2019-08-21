@@ -4,7 +4,7 @@ Hector
 ======
 **Note for the dev_slr/ branch:**
 
-This branch includes an optional sea-level component (BRICK; https://github.com/scrim-network/BRICK; https://doi.org/10.5194/gmd-10-2741-2017) that includes contributions from polar ice sheets, glaciers, and thermosteric expansion. The build process is essentially unchanged with one extra step: the BRICK fortran code must be compiled before making the Hector executable:
+This is a branch of Hector v2.0.1. This branch includes an optional sea-level component (BRICK; https://github.com/scrim-network/BRICK; https://doi.org/10.5194/gmd-10-2741-2017) that includes contributions from polar ice sheets, glaciers, and thermosteric expansion. This branch has only been built on Linux and mac. The build process is essentially unchanged with one extra step: the BRICK fortran code must be compiled before making the Hector executable:
 * $ cd source/components/BRICK_fortran/
 * $ make all
 
